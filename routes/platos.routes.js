@@ -9,6 +9,6 @@ const verificarToken = require("../middlewares/verificarToken");
 
 router.get("/all", verificarToken, getPlatos);
 router.post("/create", createPlato);
-router.get("/:id", verificarToken, getPlato);
+router.get("/:id", getPlato);
 
 module.exports = router;

@@ -1,4 +1,5 @@
 const pool = require("../db/connection");
+const { getPlatoIngredientes } = require("./plato-ingredientes.controller");
 
 const getPlatos = async (req, res) => {
     console.log("buscando platos");
