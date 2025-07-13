@@ -133,8 +133,32 @@ async function eliminarCarrito(req, res) {
     }
 }
 
+async function obtenerTotalCarrito(req, res) {
+    //   const { id } = req.usuario;
+    const id = 1;
+    try {
+        const result = await pool.query(
+            `SELECT 
+         COALESCE(SUM(subtotal), 0) AS total
+       FROM carrito
+       WHERE id_usuario = $1`,
+            [id]
+        );
+
+        const { total } = result.rows[0];
+
+        res.status(200).json({
+            total: parseFloat(total),
+            // total_platos: parseInt(total_platos),
+        });
+    } catch (error) {
+        console.error("Error al obtener total del carrito:", error);
+        res.status(500).json({ error: "Error interno del servidor 🥲" });
+    }
+}
 module.exports = {
     getCarrito,
     agregarAlCarrito,
     eliminarCarrito,
+    obtenerTotalCarrito,
 };
