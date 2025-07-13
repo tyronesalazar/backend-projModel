@@ -9,6 +9,7 @@ const {
     getFavorites,
     createFavorite,
     getUser,
+    deleteFavorite,
 } = require("../controllers/usuarios.controller");
 const verificarToken = require("../middlewares/verificarToken");
 const router = express.Router();
@@ -16,7 +17,8 @@ const router = express.Router();
 router.get("/all", getUsuarios);
 router.get("/", verificarToken, getUser);
 router.post("/create", createUsuario);
-router.post("/favorites/create", verificarToken, createFavorite);
+router.post("/favorites/create/:idMenu", verificarToken, createFavorite);
+router.delete("/favorites/delete/:idMenu", verificarToken, deleteFavorite);
 router.post("/validate-email", validateEmail);
 router.post("/check-email", checkEmail);
 router.post("/login", loginUsuario);

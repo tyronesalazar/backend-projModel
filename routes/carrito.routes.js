@@ -11,6 +11,6 @@ const router = express.Router();
 router.post("/agregar", verificarToken, agregarAlCarrito);
 router.get("/", verificarToken, getCarrito);
 router.delete("/:id_carrito", verificarToken, eliminarCarrito);
-router.get("/total", obtenerTotalCarrito);
+router.get("/total", verificarToken, obtenerTotalCarrito);
 
 module.exports = router;

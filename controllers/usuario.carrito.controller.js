@@ -134,8 +134,7 @@ async function eliminarCarrito(req, res) {
 }
 
 async function obtenerTotalCarrito(req, res) {
-    //   const { id } = req.usuario;
-    const id = 1;
+    const { id } = req.usuario;
     try {
         const result = await pool.query(
             `SELECT 

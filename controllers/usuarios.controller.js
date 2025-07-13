@@ -180,7 +180,7 @@ const getFavorites = async (req, res) => {
 
 const createFavorite = async (req, res) => {
     const { id } = req.usuario;
-    const { idMenu } = req.body;
+    const idMenu = req.params.idMenu;
 
     try {
         const result = await pool.query(
@@ -197,6 +197,22 @@ const createFavorite = async (req, res) => {
     }
 };
 
+const deleteFavorite = async (req, res) => {
+    const { id } = req.usuario;
+    const idMenu = req.params.idMenu;
+    try {
+        const result = await pool.query(
+            "DELETE FROM favoritos WHERE id_usuario = $1 AND id_menu = $2",
+            [id, idMenu]
+        );
+        res.status(200).json({ message: "Plato favorito eliminado." });
+    } catch (error) {
+        console.log("Error al eliminar plato favorito");
+        console.log(error);
+        res.status(500).json({ error: "Error del servidor" });
+    }
+};
+
 module.exports = {
     getUsuarios,
     createUsuario,
@@ -207,4 +223,5 @@ module.exports = {
     getFavorites,
     createFavorite,
     getUser,
+    deleteFavorite,
 };

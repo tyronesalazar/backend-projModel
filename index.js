@@ -27,11 +27,12 @@ app.get("/", (req, res) => {
 });
 // Rutas de usuario
 app.use("/api/usuarios", require("./routes/usuarios.routes"));
-
 // Rutas de platos
 app.use("/api/platos", require("./routes/platos.routes"));
 // Rutas de carrito
 app.use("/api/carrito", require("./routes/carrito.routes"));
+// Rutas de pedidos
+app.use("/api/pedidos", require("./routes/pedidos.routes"));
 
 server.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
