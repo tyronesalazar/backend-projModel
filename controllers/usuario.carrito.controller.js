@@ -112,7 +112,29 @@ async function agregarAlCarrito(req, res) {
     }
 }
 
+async function eliminarCarrito(req, res) {
+    const { id_carrito } = req.params;
+
+    try {
+        const result = await pool.query("DELETE FROM carrito WHERE id = $1", [
+            id_carrito,
+        ]);
+
+        if (result.rowCount === 0) {
+            return res
+                .status(404)
+                .json({ message: "No se encontró el plato del carrito" });
+        }
+
+        res.status(200).json({ message: "Plato eliminado del carrito" });
+    } catch (error) {
+        console.error("Error al eliminar plato del carrito:", error);
+        res.status(500).json({ error: "Error interno del servidor" });
+    }
+}
+
 module.exports = {
     getCarrito,
     agregarAlCarrito,
+    eliminarCarrito,
 };
