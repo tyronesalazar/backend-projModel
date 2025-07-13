@@ -1,11 +1,10 @@
 const pool = require("../db/connection");
-const { get } = require("../routes/usuarios.routes");
 
 const getPlatos = async (req, res) => {
     console.log("buscando platos");
     try {
         const result = await pool.query("SELECT * FROM menu");
-        res.status(200).json({ menu: result.rows, usuario: req.usuario });
+        res.status(200).json({ menu: result.rows });
     } catch (error) {
         console.error("Error al conseguir los platos:", error);
         res.status(500).json({ error: "Internal Server Error" });
@@ -38,8 +37,10 @@ const getPlato = async (req, res) => {
         if (result.rows.length === 0) {
             return res.status(404).json({ error: "Plato no encontrado" });
         }
+        const ingredientes = await getPlatoIngredientes(id);
         res.status(200).json({
             plato: result.rows,
+            ingredientes: ingredientes,
         });
     } catch (error) {
         console.error("Error al obtener el plato:", error);
