@@ -6,3 +6,5 @@ const verificarToken = require("../middlewares/verificarToken");
 const router = express.Router();
 
 router.post("/", verificarToken, crearPedidoDesdeCarrito);
+
+module.exports = router;
