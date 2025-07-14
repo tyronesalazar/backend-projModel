@@ -1,21 +1,30 @@
-const { Server } = require("socket.io");
 const http = require("http");
 const express = require("express");
 const app = express();
 const cors = require("cors");
 const port = 3000;
+
 const server = http.createServer(app);
+const socket = require("./middlewares/socket");
+const io = socket.init(server);
+const { verificarTokenSocket } = require("./middlewares/verificarToken");
+const { actualizarEstadoPedido } = require("./controllers/pedidos.controller");
 
-const io = new Server(server, {
-    cors: {
-        origin: "*",
-    },
-});
+const clientesConectados = new Map();
 
-io.on("connection", (socket) => {
-    socket.on("nuevo-pedido", (data) => {
-        console.log("💬 Mensaje recibido:", data);
-        io.emit("nuevo-pedido", data);
+io.use(verificarTokenSocket);
+
+io.on("connection", async (socket) => {
+    const userId = socket.userId;
+    console.log("🔗 Conexión establecida con el cliente:", userId);
+    clientesConectados.set(userId, socket.id);
+
+    socket.on("actualizar-estado-pedido", async (data) => {
+        const { id, estado } = data;
+        await actualizarEstadoPedido(id, estado);
+    });
+    socket.on("disconnect", () => {
+        clientesConectados.delete(userId);
     });
 });
 app.use(express.json());

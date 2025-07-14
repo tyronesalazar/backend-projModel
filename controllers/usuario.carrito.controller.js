@@ -148,6 +148,7 @@ async function obtenerTotalCarrito(req, res) {
 
         res.status(200).json({
             total: parseFloat(total),
+            id_usuario: id,
             // total_platos: parseInt(total_platos),
         });
     } catch (error) {
@@ -155,6 +156,7 @@ async function obtenerTotalCarrito(req, res) {
         res.status(500).json({ error: "Error interno del servidor 🥲" });
     }
 }
+
 module.exports = {
     getCarrito,
     agregarAlCarrito,

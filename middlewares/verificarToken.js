@@ -34,4 +34,20 @@ const verificarCocinero = (req, res, next) => {
     });
 };
 
-module.exports = { verificarToken, verificarCocinero };
+const verificarTokenSocket = (socket, next) => {
+    const token = socket.handshake.auth.token;
+    if (!token) {
+        return next(new Error("Token no proporcionado"));
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        socket.userId = decoded.id;
+        next();
+    } catch (error) {
+        console.log("Token invalido");
+        return next(new Error("Token inválido"));
+    }
+};
+
+module.exports = { verificarToken, verificarCocinero, verificarTokenSocket };
