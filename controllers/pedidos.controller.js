@@ -1,7 +1,7 @@
 const pool = require("../db/connection");
 
 async function crearPedidoDesdeCarrito(req, res) {
-    const { id_usuario } = req.usuario;
+    const { id } = req.usuario;
 
     const client = await pool.connect();
 
@@ -10,7 +10,7 @@ async function crearPedidoDesdeCarrito(req, res) {
 
         const carritoRes = await client.query(
             `SELECT * FROM carrito WHERE id_usuario = $1`,
-            [id_usuario]
+            [id]
         );
 
         const carritoItems = carritoRes.rows;
@@ -28,7 +28,7 @@ async function crearPedidoDesdeCarrito(req, res) {
             `INSERT INTO pedidos (id_usuario, estado, total)
          VALUES ($1, 'pendiente', $2)
          RETURNING id`,
-            [id_usuario, totalPedido]
+            [id, totalPedido]
         );
         const id_pedido = pedidoRes.rows[0].id;
 
@@ -59,9 +59,7 @@ async function crearPedidoDesdeCarrito(req, res) {
             }
         }
 
-        await client.query(`DELETE FROM carrito WHERE id_usuario = $1`, [
-            id_usuario,
-        ]);
+        await client.query(`DELETE FROM carrito WHERE id_usuario = $1`, [id]);
 
         await client.query("COMMIT");
 
@@ -79,12 +77,44 @@ async function crearPedidoDesdeCarrito(req, res) {
 }
 
 async function obtenerPedidos(req, res) {
-    const { id_usuario } = req.usuario;
-
+    const { id } = req.usuario;
     try {
         const pedidosRes = await pool.query(
-            "SELECT * FROM pedidos WHERE id_usuario = $1",
-            [id_usuario]
+            `
+        SELECT 
+        p.id AS id_pedido,
+        p.id_usuario,
+        p.estado,
+        p.fecha,
+        p.total,
+        json_agg(
+            json_build_object(
+            'id_menu', dp.id_menu,
+            'nombre_menu', m.nombre,
+            'cantidad', dp.cantidad,
+            'subtotal', dp.subtotal,
+            'ingredientes', (
+                SELECT json_agg(
+                json_build_object(
+                    'id', i.id,
+                    'nombre', i.nombre,
+                    'tipo', i.tipo,
+                    'tipo_accion', dip.tipo_accion
+                )
+                )
+                FROM detalle_ingredientes_pedido dip
+                JOIN ingredientes i ON dip.id_ingrediente = i.id
+                WHERE dip.id_detalle_pedido = dp.id
+            )
+            )
+        ) AS platos
+        FROM pedidos p
+        JOIN detalle_pedido dp ON dp.id_pedido = p.id
+        JOIN menu m ON dp.id_menu = m.id
+        WHERE p.id = $1
+        GROUP BY p.id, p.id_usuario, p.estado, p.fecha, p.total;
+        `,
+            [id]
         );
         res.json(pedidosRes.rows);
     } catch (error) {
