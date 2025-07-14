@@ -77,7 +77,6 @@ async function crearPedidoDesdeCarrito(req, res) {
 }
 
 async function obtenerPedidos(req, res) {
-    const { id } = req.usuario;
     try {
         const pedidosRes = await pool.query(
             `
@@ -113,8 +112,7 @@ async function obtenerPedidos(req, res) {
         JOIN menu m ON dp.id_menu = m.id
         GROUP BY p.id, p.id_usuario, p.estado, p.fecha, p.total
         ORDER BY p.fecha DESC
-        `,
-            [id]
+        `
         );
         res.json(pedidosRes.rows);
     } catch (error) {
