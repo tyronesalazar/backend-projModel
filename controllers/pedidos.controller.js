@@ -217,7 +217,7 @@ async function obtenerPedidoUsuario(req, res) {
             FROM pedidos p
             JOIN detalle_pedido dp ON dp.id_pedido = p.id
             JOIN menu m ON dp.id_menu = m.id
-            WHERE p.id = $1
+            WHERE p.id_usuario = $1
             GROUP BY p.id, p.id_usuario, p.estado, p.fecha, p.total
             `,
             [id]
