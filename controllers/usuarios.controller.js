@@ -108,6 +108,7 @@ const loginUsuario = async (req, res) => {
         res.status(200).json({
             message: "Inicio de sesión exitoso",
             token,
+            rol: user.rol,
         });
     } catch (error) {
         console.error("Error logging in user:", error);
