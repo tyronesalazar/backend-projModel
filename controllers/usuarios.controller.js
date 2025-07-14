@@ -169,7 +169,6 @@ const getFavorites = async (req, res) => {
 
         if (result.rows < 1)
             return res.json({ error: "No hay platos favoritos" });
-        console.log(result.rows);
         res.json(result.rows);
     } catch (error) {
         console.log("Error al obtener platos favoritos");

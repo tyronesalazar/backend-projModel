@@ -173,6 +173,54 @@ async function obtenerPedidosEnPreparacion(req, res) {
     }
 }
 
+async function obtenerPedidosListos(req, res) {
+    try {
+        const pedidosRes = await pool.query(
+            `
+        SELECT 
+        p.id AS id_pedido,
+        p.id_usuario,
+        p.estado,
+        p.fecha,
+        p.total,
+        json_agg(
+            json_build_object(
+            'id_menu', dp.id_menu,
+            'nombre_menu', m.nombre,
+            'cantidad', dp.cantidad,
+            'subtotal', dp.subtotal,
+            'ingredientes', (
+                SELECT json_agg(
+                json_build_object(
+                    'id', i.id,
+                    'nombre', i.nombre,
+                    'tipo', i.tipo,
+                    'tipo_accion', dip.tipo_accion
+                )
+                )
+                FROM detalle_ingredientes_pedido dip
+                JOIN ingredientes i ON dip.id_ingrediente = i.id
+                WHERE dip.id_detalle_pedido = dp.id
+            )
+            )
+        ) AS platos
+        FROM pedidos p
+        JOIN detalle_pedido dp ON dp.id_pedido = p.id
+        JOIN menu m ON dp.id_menu = m.id
+        WHERE p.estado = 'listo'
+        GROUP BY p.id, p.id_usuario, p.estado, p.fecha, p.total
+        ORDER BY p.fecha DESC
+        `
+        );
+        res.json(pedidosRes.rows);
+    } catch (error) {
+        console.error("Error al obtener pedidos listos:", error);
+        res.status(500).json({
+            error: "No se pudo obtener los pedidos listos",
+        });
+    }
+}
+
 async function actualizarEstadoPedido(id, estado) {
     try {
         const pedidoRes = await pool.query(
@@ -235,4 +283,5 @@ module.exports = {
     obtenerPedidoUsuario,
     obtenerPedidosEnPreparacion,
     actualizarEstadoPedido,
+    obtenerPedidosListos,
 };

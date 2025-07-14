@@ -3,6 +3,7 @@ const {
     crearPedidoDesdeCarrito,
     obtenerPedidosEnEspera,
     obtenerPedidosEnPreparacion,
+    obtenerPedidosListos,
 } = require("../controllers/pedidos.controller");
 const {
     verificarToken,
@@ -13,5 +14,6 @@ const router = express.Router();
 router.post("/", verificarToken, crearPedidoDesdeCarrito);
 router.get("/", verificarCocinero, obtenerPedidosEnEspera);
 router.get("/preparacion", verificarCocinero, obtenerPedidosEnPreparacion);
+router.get("/listos", verificarCocinero, obtenerPedidosListos);
 
 module.exports = router;

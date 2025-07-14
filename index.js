@@ -18,12 +18,15 @@ io.on("connection", async (socket) => {
     const userId = socket.userId;
     console.log("🔗 Conexión establecida con el cliente:", userId);
     clientesConectados.set(userId, socket.id);
+    console.log("lista de clientes conectados:", clientesConectados);
 
     socket.on("actualizar-estado-pedido-usuario", async (data) => {
         const { id, estado } = data;
         await actualizarEstadoPedido(id, estado);
         const socketId = clientesConectados.get(id);
+        console.log("Socket ID:", socketId);
         if (socketId) {
+            console.log("Emitiendo estado del pedido al usuario: ", id);
             io.to(socketId).emit("actualizar-estado-pedido-usuario", {
                 id,
                 estado,

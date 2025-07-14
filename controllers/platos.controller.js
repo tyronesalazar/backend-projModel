@@ -2,7 +2,6 @@ const pool = require("../db/connection");
 const { getPlatoIngredientes } = require("./plato-ingredientes.controller");
 
 const getPlatos = async (req, res) => {
-    console.log("buscando platos");
     try {
         const result = await pool.query("SELECT * FROM menu");
         res.status(200).json({ menu: result.rows });
