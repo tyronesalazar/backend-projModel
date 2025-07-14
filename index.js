@@ -19,7 +19,7 @@ io.on("connection", async (socket) => {
     console.log("🔗 Conexión establecida con el cliente:", userId);
     clientesConectados.set(userId, socket.id);
 
-    socket.on("actualizar-estado-pedido", async (data) => {
+    socket.on("actualizar-estado-pedido-usuario", async (data) => {
         const { id, estado } = data;
         await actualizarEstadoPedido(id, estado);
         const socketId = clientesConectados.get(id);
