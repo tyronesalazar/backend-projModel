@@ -22,6 +22,13 @@ io.on("connection", async (socket) => {
     socket.on("actualizar-estado-pedido", async (data) => {
         const { id, estado } = data;
         await actualizarEstadoPedido(id, estado);
+        const socketId = clientesConectados.get(userId);
+        if (socketId) {
+            io.to(socketId).emit("actualizar-estado-pedido", {
+                id,
+                estado,
+            });
+        }
     });
     socket.on("disconnect", () => {
         clientesConectados.delete(userId);
