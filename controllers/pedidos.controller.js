@@ -1,14 +1,13 @@
 const pool = require("../db/connection");
 
 async function crearPedidoDesdeCarrito(req, res) {
-    const { id_usuario } = req.params; // o del token broo
+    const { id_usuario } = req.usuario;
 
     const client = await pool.connect();
 
     try {
         await client.query("BEGIN");
 
-        // 1. Obtener todos los registros del carrito
         const carritoRes = await client.query(
             `SELECT * FROM carrito WHERE id_usuario = $1`,
             [id_usuario]
@@ -20,13 +19,11 @@ async function crearPedidoDesdeCarrito(req, res) {
             return res.status(400).json({ message: "El carrito está vacío 🫠" });
         }
 
-        // Calcular el total del pedido
         const totalPedido = carritoItems.reduce(
             (acc, item) => acc + parseFloat(item.subtotal),
             0
         );
 
-        // 2. Crear el pedido
         const pedidoRes = await client.query(
             `INSERT INTO pedidos (id_usuario, estado, total)
          VALUES ($1, 'pendiente', $2)
@@ -35,7 +32,6 @@ async function crearPedidoDesdeCarrito(req, res) {
         );
         const id_pedido = pedidoRes.rows[0].id;
 
-        // 3. Por cada item en el carrito, crear detalle_pedido y copiar sus ingredientes
         for (const item of carritoItems) {
             const detalleRes = await client.query(
                 `INSERT INTO detalle_pedido (id_pedido, id_menu, cantidad, subtotal)
@@ -45,7 +41,6 @@ async function crearPedidoDesdeCarrito(req, res) {
             );
             const id_detalle_pedido = detalleRes.rows[0].id;
 
-            // Obtener ingredientes de este carrito
             const ingredientesRes = await client.query(
                 `SELECT id_ingrediente, tipo_accion
            FROM carrito_ingredientes
@@ -83,6 +78,22 @@ async function crearPedidoDesdeCarrito(req, res) {
     }
 }
 
+async function obtenerPedidos(req, res) {
+    const { id_usuario } = req.usuario;
+
+    try {
+        const pedidosRes = await pool.query(
+            "SELECT * FROM pedidos WHERE id_usuario = $1",
+            [id_usuario]
+        );
+        res.json(pedidosRes.rows);
+    } catch (error) {
+        console.error("Error al obtener pedidos:", error);
+        res.status(500).json({ error: "No se pudo obtener los pedidos" });
+    }
+}
+
 module.exports = {
     crearPedidoDesdeCarrito,
+    obtenerPedidos,
 };
