@@ -111,8 +111,8 @@ async function obtenerPedidos(req, res) {
         FROM pedidos p
         JOIN detalle_pedido dp ON dp.id_pedido = p.id
         JOIN menu m ON dp.id_menu = m.id
-        WHERE p.id = $1
-        GROUP BY p.id, p.id_usuario, p.estado, p.fecha, p.total;
+        GROUP BY p.id, p.id_usuario, p.estado, p.fecha, p.total
+        ORDER BY p.fecha DESC
         `,
             [id]
         );
@@ -123,7 +123,54 @@ async function obtenerPedidos(req, res) {
     }
 }
 
+async function obtenerPedidoUsuario(req, res) {
+    const { id } = req.usuario;
+    try {
+        const pedidoRes = await pool.query(
+            `SELECT 
+            p.id AS id_pedido,
+            p.id_usuario,
+            p.estado,
+            p.fecha,
+            p.total,
+            json_agg(
+                json_build_object(
+                'id_menu', dp.id_menu,
+                'nombre_menu', m.nombre,
+                'cantidad', dp.cantidad,
+                'subtotal', dp.subtotal,
+                'ingredientes', (
+                    SELECT json_agg(
+                    json_build_object(
+                        'id', i.id,
+                        'nombre', i.nombre,
+                        'tipo', i.tipo,
+                        'tipo_accion', dip.tipo_accion
+                    )
+                    )
+                    FROM detalle_ingredientes_pedido dip
+                    JOIN ingredientes i ON dip.id_ingrediente = i.id
+                    WHERE dip.id_detalle_pedido = dp.id
+                )
+                )
+            ) AS platos
+            FROM pedidos p
+            JOIN detalle_pedido dp ON dp.id_pedido = p.id
+            JOIN menu m ON dp.id_menu = m.id
+            WHERE p.id = $1
+            GROUP BY p.id, p.id_usuario, p.estado, p.fecha, p.total
+            `,
+            [id]
+        );
+        res.json(pedidoRes.rows);
+    } catch (error) {
+        console.error("Error al obtener pedido usuario:", error);
+        res.status(500).json({ error: "No se pudo obtener el pedido" });
+    }
+}
+
 module.exports = {
     crearPedidoDesdeCarrito,
     obtenerPedidos,
+    obtenerPedidoUsuario,
 };

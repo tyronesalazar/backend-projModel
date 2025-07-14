@@ -5,7 +5,7 @@ const {
     createPlato,
     getPlato,
 } = require("../controllers/platos.controller");
-const verificarToken = require("../middlewares/verificarToken");
+const { verificarToken } = require("../middlewares/verificarToken");
 
 router.get("/all", verificarToken, getPlatos);
 router.post("/create", createPlato);

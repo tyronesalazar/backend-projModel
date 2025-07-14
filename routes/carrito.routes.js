@@ -5,7 +5,7 @@ const {
     eliminarCarrito,
     obtenerTotalCarrito,
 } = require("../controllers/usuario.carrito.controller");
-const verificarToken = require("../middlewares/verificarToken");
+const { verificarToken } = require("../middlewares/verificarToken");
 const router = express.Router();
 
 router.post("/agregar", verificarToken, agregarAlCarrito);

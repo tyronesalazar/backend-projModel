@@ -11,7 +11,7 @@ const {
     getUser,
     deleteFavorite,
 } = require("../controllers/usuarios.controller");
-const verificarToken = require("../middlewares/verificarToken");
+const { verificarToken } = require("../middlewares/verificarToken");
 const router = express.Router();
 
 router.get("/all", getUsuarios);
