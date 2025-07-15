@@ -165,7 +165,7 @@ async function obtenerPedidosEnPreparacion(req, res) {
         JOIN detalle_pedido dp ON dp.id_pedido = p.id
         JOIN menu m ON dp.id_menu = m.id
         WHERE p.estado = 'preparacion'
-        GROUP BY p.id, p.id_usuario, p.estado, p.fecha, p.total
+        GROUP BY p.id, p.id_usuario, u.nombre, p.estado, p.fecha, p.total
         ORDER BY p.fecha DESC
         `
         );
@@ -215,7 +215,7 @@ async function obtenerPedidosListos(req, res) {
         JOIN detalle_pedido dp ON dp.id_pedido = p.id
         JOIN menu m ON dp.id_menu = m.id
         WHERE p.estado = 'listo'
-        GROUP BY p.id, p.id_usuario, p.estado, p.fecha, p.total
+        GROUP BY p.id, p.id_usuario, u.nombre, p.estado, p.fecha, p.total
         ORDER BY p.fecha DESC
         `
         );
@@ -275,7 +275,7 @@ async function obtenerPedidoUsuario(req, res) {
             JOIN detalle_pedido dp ON dp.id_pedido = p.id
             JOIN menu m ON dp.id_menu = m.id
             WHERE p.id_usuario = $1
-            GROUP BY p.id, p.id_usuario, p.estado, p.fecha, p.total
+            GROUP BY p.id, p.id_usuario, u.nombre, p.estado, p.fecha, p.total
             `,
             [id]
         );
