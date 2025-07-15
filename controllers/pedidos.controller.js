@@ -85,6 +85,7 @@ async function obtenerPedidosEnEspera(req, res) {
         SELECT 
         p.id AS id_pedido,
         p.id_usuario,
+        u.nombre AS nombre_cliente,
         p.estado,
         p.fecha,
         p.total,
@@ -110,11 +111,13 @@ async function obtenerPedidosEnEspera(req, res) {
             )
         ) AS platos
         FROM pedidos p
+        JOIN usuarios u ON u.id = p.id_usuario
         JOIN detalle_pedido dp ON dp.id_pedido = p.id
         JOIN menu m ON dp.id_menu = m.id
         WHERE p.estado = 'pendiente'
-        GROUP BY p.id, p.id_usuario, p.estado, p.fecha, p.total
-        ORDER BY p.fecha DESC
+        GROUP BY p.id, p.id_usuario, u.nombre, p.estado, p.fecha, p.total
+        ORDER BY p.fecha DESC;
+
         `
         );
         res.json(pedidosRes.rows);
@@ -132,6 +135,7 @@ async function obtenerPedidosEnPreparacion(req, res) {
         SELECT 
         p.id AS id_pedido,
         p.id_usuario,
+        u.nombre AS nombre_cliente,
         p.estado,
         p.fecha,
         p.total,
@@ -157,6 +161,7 @@ async function obtenerPedidosEnPreparacion(req, res) {
             )
         ) AS platos
         FROM pedidos p
+        JOIN usuarios u ON u.id = p.id_usuario
         JOIN detalle_pedido dp ON dp.id_pedido = p.id
         JOIN menu m ON dp.id_menu = m.id
         WHERE p.estado = 'preparacion'
@@ -180,6 +185,7 @@ async function obtenerPedidosListos(req, res) {
         SELECT 
         p.id AS id_pedido,
         p.id_usuario,
+        u.nombre AS nombre_cliente,
         p.estado,
         p.fecha,
         p.total,
@@ -205,6 +211,7 @@ async function obtenerPedidosListos(req, res) {
             )
         ) AS platos
         FROM pedidos p
+        JOIN usuarios u ON u.id = p.id_usuario
         JOIN detalle_pedido dp ON dp.id_pedido = p.id
         JOIN menu m ON dp.id_menu = m.id
         WHERE p.estado = 'listo'
@@ -238,6 +245,7 @@ async function obtenerPedidoUsuario(req, res) {
             `SELECT 
             p.id AS id_pedido,
             p.id_usuario,
+            u.nombre AS nombre_cliente,
             p.estado,
             p.fecha,
             p.total,
@@ -263,6 +271,7 @@ async function obtenerPedidoUsuario(req, res) {
                 )
             ) AS platos
             FROM pedidos p
+            JOIN usuarios u ON u.id = p.id_usuario
             JOIN detalle_pedido dp ON dp.id_pedido = p.id
             JOIN menu m ON dp.id_menu = m.id
             WHERE p.id_usuario = $1
